@@ -2,10 +2,10 @@ ARCH = $(shell uname -m)
 
 all: AssistVision-$(ARCH) run
 
-AssistVision-$(ARCH): main.cpp makefile vision.h vision.cpp
+AssistVision-$(ARCH): main.cpp makefile vision.h vision.cpp network.h network.cpp networkexception.h
 	g++ -Wall -o $@ `pkg-config --cflags --libs opencv` *.cpp
 
-run:
+run: 
 	./AssistVision-$(ARCH)
 
 clean:
