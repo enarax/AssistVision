@@ -1,6 +1,9 @@
 #ifndef _NETWORK_H
 #define _NETWORK_H
 
+#include "networkexception.h"
+#include "networkmessage.h"
+
 #include <cstddef>
 #include <stdio.h>
 #include <sys/types.h>
@@ -9,10 +12,12 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 #define BUFLEN 256
+#define MSGLEN 255
 
 class networkrobot
 {
@@ -20,7 +25,7 @@ class networkrobot
 protected:
 	bool _connected;
 
-	static char _buf[BUFLEN];
+	static unsigned char _buf[BUFLEN];
 	
 	int _outsocket;
 	int _insocket;
@@ -31,14 +36,54 @@ protected:
 	const unsigned short _robotport;
 	const unsigned short _listenport;
 	
+	void int_send(const unsigned char* message, int len);
+	
 public:
 	networkrobot(const char* robotaddr, unsigned short robotport, unsigned short listenport);
 	
 	void connect();
 	
-	int send(const string& message);
-	string receive(bool block);
+	void sendmessage(networkmessage const*);
+	
+	networkmessage* receivemessage(bool block);
+	
+	
+	
+	/*template<class T>
+	inline void send(const T& networkmessage)
+	{
+		int_send(&message, 1);
+	}*/
+	
+
+	/*template<class T>
+	bool receive(T* ret)
+	{
+		if(!_connected)
+			throw notconnectedexception();
+
+		int bytes = recv(_insocket, _buf, BUFLEN, MSG_DONTWAIT);
+	
+		if(bytes == -1)
+			return false;
+		
+		int messagelength = _buf[0];
+		for(int i = 0; i < messagelength; i++)
+		{
+			*(((void*)&ret)+i) = _buf[i+1];
+		}
+		
+		return true;
+	}*/
+	
 };
+
+/*template<>
+	inline void networkrobot::send<string>(const string& message)
+	{
+		int_send<char>(message.c_str(), (int)message.length());
+	}*/
+
 
 
 

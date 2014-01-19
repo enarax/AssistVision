@@ -8,14 +8,14 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
+#include <algorithm>
 #include <errno.h>
 
-char networkrobot::_buf[BUFLEN];
+unsigned char networkrobot::_buf[BUFLEN];
 
 
 networkrobot::networkrobot(const char* robotaddr, unsigned short robotport, unsigned short listenport)
-	:_robotaddr(robotaddr), _robotport(robotport), _listenport(listenport), _connected(false)
+	:_connected(false), _outsocket(-1), _insocket(-1), _robotaddr(robotaddr), _robotport(robotport), _listenport(listenport)
 {
 	connect();
 }
@@ -49,38 +49,63 @@ void networkrobot::connect()
 	
 }
 
-
-int networkrobot::send(const string& message)
+void networkrobot::int_send(const unsigned char* message, int len)
 {
 	if(!_connected)
 		throw notconnectedexception();
 
-	if(message.length() >= BUFLEN)
-		throw bufferexception(BUFLEN-1, message.length());
+	if(len > MSGLEN)
+		throw bufferexception(MSGLEN, len);
+	unsigned char messagelength = (unsigned char)len;
 	//load into
-	for(int i = 0; i < message.length(); i++)
-	{
-		_buf[i+1] = 0;
-		_buf[i] = message.at(i);
-	}
-    int rc = sendto(_outsocket, (const void*)_buf, (size_t)message.length(), 0, (struct sockaddr *) &_outaddr, sizeof(_outaddr));
+	_buf[0] = messagelength;
+	for(int i = 0; i < messagelength; i++)
+		_buf[i+1] = message[i];
+	int rc = sendto(_outsocket, (const void*)_buf, messagelength+1, 0, (struct sockaddr *) &_outaddr, sizeof(_outaddr));
 	if(rc == -1)
-		return -1;
-    
-    return rc;
+		throw sendexception();
+}
+
+void networkrobot::sendmessage(networkmessage const* msg)
+{
+	vector<unsigned char> messagedata = msg->serialize();
+	if(messagedata.size() > MSGLEN-2)
+		throw messagelengthexceededexception();
+	printf("%u, ", msg->getGuid());
+	GUID netid = ENCODEGUID(msg->getGuid());
+	printf("%u\n", netid);
+	vector<unsigned char> data;
+	data.push_back((netid >> 8) & 0xff);
+	data.push_back(netid & 0xff);
+	copy(messagedata.begin(), messagedata.end(), back_inserter(data));
+	
+	int_send(&data[0], data.size());
 }
 
 
-string networkrobot::receive(bool block)
+networkmessage* networkrobot::receivemessage(bool block)
 {
 	if(!_connected)
 		throw notconnectedexception();
 
-	int bytes = recv(_insocket, _buf, BUFLEN, block ? 0 : MSG_DONTWAIT);
+	int bytes = recv(_insocket, _buf, BUFLEN-1, block ? 0 : MSG_DONTWAIT);
+	
+	
+
 	if(bytes == -1)
-		return "";
-		
-	return _buf;
+		return 0;
+	
+	int messagelength = _buf[0];
+	int guid = DECODEGUID((short)(((unsigned char)_buf[1]) << 8 | ((unsigned char)_buf[2])));
+	printf("%i\n", guid);
+	
+	networkmessage* ret = createmessage(guid);
+	ret->deserialize(_buf+3, messagelength-2);
+	return ret;
 }
+	
+	
+
+	
 
 
