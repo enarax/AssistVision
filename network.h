@@ -16,8 +16,8 @@
 
 using namespace std;
 
-#define BUFLEN 256
-#define MSGLEN 255
+#define BUFLEN 1500
+#define MSGLEN 1498
 
 class networkrobot
 {
