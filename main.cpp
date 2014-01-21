@@ -17,9 +17,11 @@ int main(void)
 {
 	networkrobot robot(robotaddr, robotport, listenport);
 	
-	/*message_targethot msg(1);
-	robot.sendmessage(&msg);*/
+	//sample sending code
+	message_targethot msg(1);
+	robot.sendmessage(&msg);
 	
+	//sample receiving code
 	while(1)
 	{
 		networkmessage* msg = robot.receivemessage(true);
@@ -34,6 +36,8 @@ int main(void)
 		}
 		else
 			throw std::exception();
+			
+		deletemessage(&msg);
 	}
 	
 	

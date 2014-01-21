@@ -1,5 +1,7 @@
 #include "message_targethot.h"
 
+REGISTER_MESSAGE_DEFAULT(MSGID_TARGETHOT, message_targethot);
+
 
 message_targethot::message_targethot()
 	:_ishot(false)
@@ -14,8 +16,6 @@ message_targethot::message_targethot(bool ishot)
 
 bool message_targethot::isHot() const
 {
-	if(!isLoaded())
-		throw notloadedexception();
 	return _ishot;
 }
 
@@ -37,7 +37,7 @@ std::vector<unsigned char> message_targethot::serialize() const
 	return ret;
 }
 
-void message_targethot::int_deserialize(const unsigned char* data, int len)
+void message_targethot::deserialize(const unsigned char* data, int len)
 {
 	if(len != 1)
 		throw deserializationexception();
@@ -45,3 +45,4 @@ void message_targethot::int_deserialize(const unsigned char* data, int len)
 	//if not zero, then it's hot
 	_ishot = (data[0] != 0);
 }
+

@@ -71,9 +71,7 @@ void networkrobot::sendmessage(networkmessage const* msg)
 	vector<unsigned char> messagedata = msg->serialize();
 	if(messagedata.size() > MSGLEN-2)
 		throw messagelengthexceededexception();
-	printf("%u, ", msg->getGuid());
 	GUID netid = ENCODEGUID(msg->getGuid());
-	printf("%u\n", netid);
 	vector<unsigned char> data;
 	data.push_back((netid >> 8) & 0xff);
 	data.push_back(netid & 0xff);
@@ -90,18 +88,14 @@ networkmessage* networkrobot::receivemessage(bool block)
 
 	int bytes = recv(_insocket, _buf, BUFLEN-1, block ? 0 : MSG_DONTWAIT);
 	
-	
 
 	if(bytes == -1)
 		return 0;
 	
 	int messagelength = _buf[0];
 	int guid = DECODEGUID((short)(((unsigned char)_buf[1]) << 8 | ((unsigned char)_buf[2])));
-	printf("%i\n", guid);
 	
-	networkmessage* ret = createmessage(guid);
-	ret->deserialize(_buf+3, messagelength-2);
-	return ret;
+	return networkmessage::createmessage(guid, _buf+3, messagelength-2);
 }
 	
 	

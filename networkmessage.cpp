@@ -1,41 +1,42 @@
 #include "networkmessage.h"
+#include <stdexcept>
+#include <stdio.h>
 
-#include "message_targethot.h"
-
-
-
-
-networkmessage* createmessage(GUID id)
-{
-
-	
-	REGISTERCLASS(MSGID_TARGETHOT, message_targethot)
-
-
-	
-	throw guidunregisteredexception(id);
-};
-
-
-
-
+int i = 0;
 
 networkmessage::networkmessage()
-	:_loaded(false)
-{
-}
+{}
 
 networkmessage::~networkmessage()
+{}
+
+
+std::map<GUID, messagecreator>& networkmessage::getFactoryTable()
 {
+	static std::map<GUID, messagecreator> factorytable;
+	return factorytable;
 }
 
-bool networkmessage::isLoaded() const
+networkmessage* networkmessage::createmessage(GUID guid, unsigned char* data, int datalen)
 {
-	return _loaded;
+	try {
+		return getFactoryTable().at(guid)(data, datalen);
+	}
+	catch(std::out_of_range ex){
+		throw guidunregisteredexception(guid);
+	}
 }
 
-void networkmessage::deserialize(const unsigned char* data, int len)
+bool networkmessage::ismessageregistered(GUID guid)
 {
-	int_deserialize(data, len);
-	_loaded = true;
+	return getFactoryTable().count(guid); //can only be 0 or 1
+}
+void networkmessage::registermessage(GUID guid, messagecreator creator)
+{
+	getFactoryTable()[guid] = creator;
+	
+}
+void networkmessage::unregistermessage(GUID guid)
+{
+	getFactoryTable().erase(guid);
 }

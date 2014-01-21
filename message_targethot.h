@@ -12,8 +12,6 @@ class message_targethot : public networkmessage
 protected:
 	bool _ishot;
 	
-	virtual void int_deserialize(const unsigned char* data, int len);
-	
 public:
 	message_targethot();
 	message_targethot(bool ishot);
@@ -26,7 +24,10 @@ public:
 	
 	virtual std::vector<unsigned char> serialize() const;
 	
+	virtual void deserialize(const unsigned char* data, int len);
 
 };
+
+
 
 #endif
