@@ -39,11 +39,5 @@ inline void deletemessage(networkmessage** messageptr)
 	*messageptr = 0;
 };
 
-networkmessage* createmessage(GUID id);
-
-
-
-
-
 
 #endif
