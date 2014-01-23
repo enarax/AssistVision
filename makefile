@@ -10,3 +10,5 @@ run:
 
 clean:
 	rm -f AssistVision-$(ARCH)
+	
+rebuild: clean all
