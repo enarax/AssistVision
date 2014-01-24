@@ -2,6 +2,7 @@
 #define _MESSAGE_TARGETHOT_H
 
 #include "networkmessage.h"
+#include "networkbuffer.h"
 
 
 #define MSGID_TARGETHOT 12001
@@ -22,7 +23,7 @@ public:
 
 	virtual GUID getGuid() const;
 	
-	virtual std::vector<unsigned char> serialize() const;
+	virtual void serialize(networkbuffer_in&) const;
 	
 	virtual void deserialize(const unsigned char* data, int len);
 

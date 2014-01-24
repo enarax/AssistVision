@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string>
 #include <exception>
+#include <sstream>
 
 
 bool r1, r2, r3;
@@ -15,6 +16,7 @@ const unsigned short listenport = 12868;
 
 int main(void)
 {
+
 	networkrobot robot(robotaddr, robotport, listenport);
 	
 	//sample sending code

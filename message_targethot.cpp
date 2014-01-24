@@ -30,11 +30,9 @@ GUID message_targethot::getGuid() const
 }
 
 
-std::vector<unsigned char> message_targethot::serialize() const
+void message_targethot::serialize(networkbuffer_in& data) const
 {
-	std::vector<unsigned char> ret;
-	ret.push_back((char)_ishot);
-	return ret;
+	data << _ishot;
 }
 
 void message_targethot::deserialize(const unsigned char* data, int len)
