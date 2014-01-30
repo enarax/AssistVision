@@ -25,7 +25,7 @@ public:
 	
 	virtual void serialize(networkbuffer_in&) const;
 	
-	virtual void deserialize(const unsigned char* data, int len);
+	virtual void deserialize(networkbuffer_out);
 
 };
 

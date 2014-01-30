@@ -35,12 +35,8 @@ void message_targethot::serialize(networkbuffer_in& data) const
 	data << _ishot;
 }
 
-void message_targethot::deserialize(const unsigned char* data, int len)
+void message_targethot::deserialize(networkbuffer_out data)
 {
-	if(len != 1)
-		throw deserializationexception();
-		
-	//if not zero, then it's hot
-	_ishot = (data[0] != 0);
+	data >> _ishot;
 }
 
