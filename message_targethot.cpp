@@ -38,5 +38,6 @@ void message_targethot::serialize(networkbuffer_in& data) const
 void message_targethot::deserialize(networkbuffer_out data)
 {
 	data >> _ishot;
+	
 }
 
