@@ -17,7 +17,7 @@
 #define REQUIRED 3
 
 
-const char* robotaddr = "10.28.23.1";
+const char* robotaddr = "10.28.23.21";
 const unsigned short robotport = 12869;
 const unsigned short listenport = 12868;
 
