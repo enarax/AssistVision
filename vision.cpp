@@ -9,41 +9,40 @@ extern bool r1, r2, r3;
 
 Mat FilterImage(const Mat& image)
 {
-	Mat hsv;
 
+	Mat ret = Mat::zeros(image.size(), CV_8UC1);
+	
 	//convert to HSV
+	Mat hsv;
 	cvtColor(image, hsv, CV_BGR2HSV);
-
 	//get the channels;
-	vector<Mat> v_channel(3);
-	split(hsv,v_channel);
+	//vector<Mat> v_channel(3);
+	//split(hsv,v_channel);
 	//treshold
-	for(int y = 0; y<hsv.rows; y++)
+	
+	for(int y = 0; y<hsv.rows; ++y)
 	{
-		for(int x = 0; x<hsv.cols; x++){
+		for(int x = 0; x<hsv.cols; ++x){
 			Point ref(x, y);
-			UINT8 h, s, v;
-			h = v_channel[0].at<UINT8>(ref);
-			s = v_channel[1].at<UINT8>(ref);
-			v = v_channel[2].at<UINT8>(ref);
+			Vec3b color = hsv.at<Vec3b>(ref);
+			UINT8 h = color[0];
+			UINT8 s = color[1];
+			UINT8 v = color[2];
 			//treshold
-			if(v < MINVALUE) //value is low
-				hsv.at<Vec3b>(ref) = Vec3b();
+			UINT8& cache = ret.at<UINT8>(ref);
 
-			if(h < MINHUE || h > MAXHUE) //hue is not within limits
-				hsv.at<Vec3b>(ref) = Vec3b();
-
-			if(s < MINSATURATION || s > MAXSATURATION) //saturation not within limits
-				hsv.at<Vec3b>(ref) = Vec3b();
+			if(v >= MINVALUE && h >= MINHUE && h <= MAXHUE && s >= MINSATURATION && s <= MAXSATURATION){ //everything is within limits
+				cache = v;
+				
+			}
+			/*if(x == 60 && y == 60)
+				printf("did st %u\n", ret.at<UINT8>(ref));*/
 
 		}
 	}
+	
 
-	//convert back to BGR
-	Mat backcvt;
-	cvtColor(hsv, backcvt, CV_HSV2BGR);
-
-	return backcvt;
+	return ret;
 }
 
 
@@ -55,7 +54,8 @@ bool contourAreaComparer(const vector<Point>& a, const vector<Point>& b) {
 
 void GetContours(Mat image, vector<vector<Point> >& out_contours, vector<Vec4i>& out_hierarchy)
 {
-		findContours(image, out_contours, out_hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+	Mat copy = image.clone();
+		findContours(copy, out_contours, out_hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
 }
 
 vector<vector<Point> > GetTargetContours(const vector<vector<Point> >& all_contours, const vector<Vec4i>& hierarchy)
@@ -76,10 +76,14 @@ vector<vector<Point> > GetTargetContours(const vector<vector<Point> >& all_conto
 
 	if(contours_poly.size() > 0)
 	{
+		int num = 0;
 		double maxsize = contourArea(contours_poly[0]);
 		for(unsigned int i = 0; i < contours_poly.size(); i++){
-			if(contourArea(contours_poly[i]) >= maxsize * AREA_RATIO)
+			if(contourArea(contours_poly[i]) >= maxsize * AREA_RATIO){
 				ret.push_back(contours_poly[i]);
+				if(++num >= 2)
+					break;
+				}
 		}
 	}
 
