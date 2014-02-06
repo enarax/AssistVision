@@ -2,8 +2,8 @@ ARCH = $(shell uname -m)
 
 all: AssistVision-$(ARCH) run
 
-AssistVision-$(ARCH): main.cpp makefile vision.h vision.cpp message_targethot.h message_targethot.cpp message_requeststatus.h message_requeststatus.cpp
-	g++ -Wall -I"../Robot-Networking/include" -L"../Robot-Networking/lib"  -o $@ `pkg-config --cflags --libs opencv` *.cpp -lrobotnetworking
+AssistVision-$(ARCH): main.cpp makefile vision.h vision.cpp
+	g++ -g -Wall   -o $@ `pkg-config --cflags --libs opencv` *.cpp
 
 run: 
 	./AssistVision-$(ARCH)
