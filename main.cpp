@@ -35,6 +35,12 @@ bool averagebuffer()
 
 int main(void)
 {
+	//setup the gpio
+	system("echo \"11\" > /sys/class/gpio/export");
+	system("echo \"out\" > /sys/class/gpio/gpio11/direction");
+	
+
+
 
 	for(int i = 0; i < BUFFERLEN; i++)
 		resultbuffer[i] = false;
@@ -95,10 +101,14 @@ int main(void)
 		sprintf(buf, "/shared/AssistVision/capture/frame%i.jpg", count);
 		//imwrite(buf, src);
 		
-				if(averagebuffer())
+				if(averagebuffer()){
 					printf("%i - hot\n", count);
-				else
+					system("echo \"1\" > /sys/class/gpio/gpio11/value");	
+				}
+				else{
 					printf("%i - nothot\n", count);
+					system("echo \"0\" > /sys/class/gpio/gpio11/value");
+				}
 		
 	}
 	
