@@ -61,6 +61,8 @@ int main(void)
 	while(1)
 	{
 		
+		
+
 		// create a window to display detected faces
 		//cvNamedWindow("Sample Program", CV_WINDOW_AUTOSIZE);
 	 	//printf("grabframe ret %d\n", cvGrabFrame(capture));
@@ -73,6 +75,12 @@ int main(void)
             continue;
 	 	if(src.empty())
 	 		continue;
+	 		
+	 		//flash the LED
+		if(count % 30 == 0)
+			system("echo \"0\" > /sys/class/leds/led0/brightness");
+		else
+			system("echo \"1\" > /sys/class/leds/led0/brightness");
 	 	
 	 	
 		
@@ -98,16 +106,16 @@ int main(void)
 		//imshow("Sample Program", filtered_grey);
 		
 		char buf[255];
-		sprintf(buf, "/shared/AssistVision/capture/frame%i.jpg", count);
+		//sprintf(buf, "/shared/AssistVision/capture/frame%i.jpg", count);
 		//imwrite(buf, src);
 		
 				if(averagebuffer()){
 					printf("%i - hot\n", count);
-					system("echo \"1\" > /sys/class/gpio/gpio11/value");	
+					system("echo \"0\" > /sys/class/gpio/gpio11/value");	
 				}
 				else{
 					printf("%i - nothot\n", count);
-					system("echo \"0\" > /sys/class/gpio/gpio11/value");
+					system("echo \"1\" > /sys/class/gpio/gpio11/value");
 				}
 		
 	}

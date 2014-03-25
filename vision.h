@@ -32,7 +32,7 @@
 #define MAXSATURATION 255
 #endif
 
-#define AREA_RATIO 0.8
+#define AREA_RATIO 0.65
 
 
 
